@@ -12,7 +12,10 @@ export default defineComponent({
   name: 'HelloWorld',
   props: {
     msg: String,
-    age: Number,
+    age: {
+      type: Number,
+      required: true,
+    },
   },
 })
 </script>
