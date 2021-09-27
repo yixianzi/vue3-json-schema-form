@@ -1,20 +1,49 @@
-import { reactive, defineComponent } from 'vue'
-import HelloWorld from './components/HelloWorld'
-const img = require('./assets/logo.png') // eslint-disable-line
+import { reactive, defineComponent, ref, Ref } from 'vue'
+
+import MonacoEditor from './components/MonacoEditor'
+import { createUseStyles } from 'vue-jss'
+
+const useStyles = createUseStyles({
+  editor: {
+    minHeight: 400,
+  },
+})
+
+function toJson(data: any) {
+  return JSON.stringify(data, null, 2) // 第三个参数是定义换行和tab的格数
+}
+
+const schema = {
+  type: 'string',
+}
 
 export default defineComponent({
   setup() {
-    const state = reactive({
-      name: 'gxy',
-    })
+    const schemaRef: Ref<any> = ref(schema)
+
+    const handleCodeChange = (code: string) => {
+      let schema: any
+      try {
+        schema = JSON.parse(code)
+      } catch (err) {
+        console.log(err)
+      }
+      schemaRef.value = schema
+    }
+
+    const classesRef = useStyles()
+
     return () => {
-      // 这里可以继续写一些逻辑
+      const classes = classesRef.value
+      const code = toJson(schemaRef.value)
       return (
-        <div id="app">
-          <img src={img} alt="Vue logo" />
-          <p>{state.name}</p>
-          <HelloWorld age={12} />
-          <input v-model={state.name} />
+        <div>
+          <MonacoEditor
+            code={code}
+            onChange={handleCodeChange}
+            title="Schema"
+            class={classes.editor}
+          />
         </div>
       )
     }
